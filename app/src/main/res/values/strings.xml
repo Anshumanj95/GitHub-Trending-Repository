@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Trending</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sort_by_stars">Sort by forks</string>
+    <string name="sort_by_name">Sort by watcher</string>
+    <string name="fullname">anshumanjaindhfisiooios</string>
+    <string name="description">description</string>
+</resources>
