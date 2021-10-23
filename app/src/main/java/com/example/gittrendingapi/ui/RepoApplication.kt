@@ -1,4 +1,4 @@
-package com.example.gittrendingapi
+package com.example.gittrendingapi.ui
 
 import android.app.Application
 

@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.gittrendingapi.databinding.RepoAdapterBinding
 import com.example.gittrendingapi.models.Item
+import com.example.gittrendingapi.util.GlideApp
 
 
-class RepoAdapter(private val onItemClicked:(Item)->Unit):
+class RepoAdapter:
     RecyclerView.Adapter<RepoAdapter.ItemViewHolder>() {
 
     companion object {
@@ -37,7 +37,7 @@ class RepoAdapter(private val onItemClicked:(Item)->Unit):
                 description.text=item.description
                 fullName.text=item.full_name
                 name.text=item.name
-                Glide.with(itemView.context).load(item.owner.avatar_url).into(image)
+                GlideApp.with(itemView.context).load(item.owner.avatar_url).into(image)
             }
         }
 

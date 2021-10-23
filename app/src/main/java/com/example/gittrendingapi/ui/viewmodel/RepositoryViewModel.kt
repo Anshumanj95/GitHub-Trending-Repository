@@ -1,21 +1,19 @@
-package com.example.gittrendingapi
+package com.example.gittrendingapi.ui.viewmodel
 
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.*
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gittrendingapi.models.ApiResponse
 import com.example.gittrendingapi.models.Item
 import com.example.gittrendingapi.repository.ItemRepository
+import com.example.gittrendingapi.ui.RepoApplication
 import com.example.gittrendingapi.util.Resource
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
@@ -63,7 +61,7 @@ class RepositoryViewModel(app:Application,val itemRepository: ItemRepository):An
     }
 
 
-    private fun hasInternetConnection():Boolean{
+     fun hasInternetConnection():Boolean{
         val connectivityManager=getApplication<RepoApplication>().getSystemService(
             Context.CONNECTIVITY_SERVICE
         )as ConnectivityManager

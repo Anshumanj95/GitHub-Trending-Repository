@@ -1,21 +1,20 @@
-package com.example.gittrendingapi.ui
+package com.example.gittrendingapi.ui.fragment
 
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.gittrendingapi.MainActivity
 import com.example.gittrendingapi.R
-import com.example.gittrendingapi.RepositoryViewModel
 import com.example.gittrendingapi.adapter.RepoAdapter
 import com.example.gittrendingapi.databinding.FragmentRepoBinding
+import com.example.gittrendingapi.ui.MainActivity
+import com.example.gittrendingapi.ui.viewmodel.RepositoryViewModel
 
 class RepoFragment : Fragment() {
 
     private var _binding:FragmentRepoBinding?=null
     private val binding get() = _binding!!
-    lateinit var viewModel:RepositoryViewModel
+    lateinit var viewModel: RepositoryViewModel
     lateinit var repoAdapter: RepoAdapter
 
     override fun onCreateView(
@@ -33,20 +32,16 @@ class RepoFragment : Fragment() {
 
         viewModel=(activity as MainActivity).viewModel
         setupRecyclerView()
-        viewModel.allrepo.observe(viewLifecycleOwner, { response ->
-            showShimmer()
-            response.let {
-                hideShimmer()
-                repoAdapter.differ.submitList(it)
-
-            }
-        })
+        if(viewModel.hasInternetConnection())
+            fromApiCall()
+        else
+            fromRoom()
         binding.refresh.setOnRefreshListener {
             showShimmer()
-            binding.refresh.isRefreshing=false
+            binding.refresh.isRefreshing = false
         }
-
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.option_menu,menu)
@@ -56,15 +51,73 @@ class RepoFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.menu_fork->{
-                displayByForks()
+                if(viewModel.hasInternetConnection())
+                    fromApiCallByFork()
+                else
+                    displayByForks()
                 true
             }
             R.id.menu_watcher->{
-                displayByWatcher()
+                if(viewModel.hasInternetConnection())
+                    fromApiCallByWatcher()
+                else
+                    displayByWatcher()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+
+    }
+    fun fromApiCall() {
+        viewModel.repositories.observe(viewLifecycleOwner, { response ->
+            showShimmer()
+            response.let { ApiResponse ->
+                ApiResponse.data?.let { it ->
+                    hideShimmer()
+                    repoAdapter.differ.submitList(it.items)
+                }
+
+            }
+        })
+
+    }
+    fun fromRoom(){
+        viewModel.allrepo.observe(viewLifecycleOwner, { response ->
+            showShimmer()
+            response.let { it ->
+                hideShimmer()
+                repoAdapter.differ.submitList(it)
+
+            }
+        })
+
+    }
+    fun fromApiCallByFork() {
+        viewModel.repositories.observe(viewLifecycleOwner, { response ->
+            showShimmer()
+            response.let { ApiResponse ->
+                ApiResponse.data?.let { it ->
+                    hideShimmer()
+
+                    repoAdapter.differ.submitList(it.items.sortedWith(compareBy { it.forks_count }))
+                }
+
+            }
+        })
+
+    }
+    fun fromApiCallByWatcher() {
+        viewModel.repositories.observe(viewLifecycleOwner, { response ->
+            showShimmer()
+            response.let { ApiResponse ->
+                ApiResponse.data?.let { it ->
+                    hideShimmer()
+
+                    repoAdapter.differ.submitList(it.items.sortedWith(compareBy { it.watchers_count }))
+                }
+
+            }
+        })
 
     }
 
@@ -99,7 +152,7 @@ class RepoFragment : Fragment() {
         binding.shimmerLayout.startShimmer()
     }
     private fun setupRecyclerView(){
-        repoAdapter= RepoAdapter{}
+        repoAdapter= RepoAdapter()
         binding.recyclerview.apply {
             adapter =repoAdapter
             layoutManager= LinearLayoutManager(activity)
